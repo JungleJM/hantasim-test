@@ -1,0 +1,19 @@
+project_id: replace-me
+repo_url: ssh://git@appliedsci.tail90eacc.ts.net:411/gitea_admin/replace-me.git
+default_branch: main
+
+specs_dir: specs
+feature_branch_prefix: feature/
+task_branch_prefix: task/
+
+requires_human_feature_merge: true
+preview_required: true
+proof_required: true
+
+allowed_runtime:
+  manager_node: bluefin
+  developer_node: default
+  code_review_node: default
+  local_pr_agent_node: default
+  codex_pr_agent_node: default
+  preview_node: bluefin

@@ -1,0 +1,14 @@
+preview:
+  kind: web
+  install: ""
+  build: ""
+  serve: ""
+  port: 4173
+  public_base_url: http://bluefin.tail90eacc.ts.net
+
+proof:
+  required: true
+  preferred:
+    - playwright
+    - asciinema
+  not_applicable_requires_reason: true

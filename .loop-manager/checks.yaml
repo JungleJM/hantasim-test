@@ -1,0 +1,14 @@
+checks:
+  install: ""
+  lint: ""
+  typecheck: ""
+  test: ""
+  build: ""
+
+required_for_task_pr:
+  - test
+  - build
+
+required_for_feature_review:
+  - test
+  - build
