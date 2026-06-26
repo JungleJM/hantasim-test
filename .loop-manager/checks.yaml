@@ -1,14 +1,18 @@
 checks:
-  install: ""
-  lint: ""
-  typecheck: ""
-  test: ""
-  build: ""
+  install: "cargo fetch"
+  lint: "cargo fmt --all -- --check && cargo clippy --all-targets -- -D warnings"
+  typecheck: "cargo check --all-targets"
+  test: "cargo test --all-targets"
+  build: "cargo build"
 
 required_for_task_pr:
+  - lint
+  - typecheck
   - test
   - build
 
 required_for_feature_review:
+  - lint
+  - typecheck
   - test
   - build
