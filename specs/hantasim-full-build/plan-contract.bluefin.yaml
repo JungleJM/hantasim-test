@@ -1,0 +1,272 @@
+plan_id: hantasim-full-build
+title: HantaSim full native desktop build
+repo_url: /var/home/j/code/hantasim-test
+base_branch: feature/hantasim-full-build
+summary: >
+  Build HantaSim from scratch as a native desktop Rust/Bevy educational
+  simulation with environmental hantavirus spread, plain-language statistics,
+  controls, persistence, proof artifacts, and issue tracking.
+planner:
+  provider: codex
+  model: frontier
+  machine: jmapple
+  notes: >
+    Drafted from HantaSim-Overview and specs/hantasim-full-build. This contract
+    is intended for Bluefin, where repo_url points to the local checkout used
+    for real git worktrees.
+tasks:
+  - task_id: hantasim-full-build-001-scaffold
+    title: Scaffold Rust/Bevy app architecture
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-001-scaffold
+    goal: >
+      Create a runnable native desktop Rust/Bevy 0.18 app with clean module
+      boundaries for simulation, rendering, UI, statistics, and persistence.
+    allowed_paths:
+      - Cargo.toml
+      - Cargo.lock
+      - src/**
+      - tests/**
+      - assets/**
+    acceptance_criteria:
+      - cargo run opens a Bevy window titled for HantaSim.
+      - Required Rust checks pass.
+      - Module boundaries exist for later tasks.
+    checks: &rust_checks
+      - cargo fmt --all -- --check
+      - cargo clippy --all-targets -- -D warnings
+      - cargo check --all-targets
+      - cargo test --all-targets
+      - cargo build
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-002-sim-domain
+    title: Build deterministic simulation domain state
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-002-sim-domain
+    goal: >
+      Implement testable plain-data simulation state, seeded randomness, health
+      states, entity identifiers, and core invariants without rendering logic.
+    allowed_paths: &code_paths
+      - Cargo.toml
+      - Cargo.lock
+      - src/**
+      - tests/**
+      - assets/**
+    acceptance_criteria:
+      - Same seed produces the same initial model state.
+      - Health and simulation state are testable without Bevy rendering.
+      - No person-to-person infection path exists.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-003-world-generation
+    title: Generate world, POIs, humans, and mice
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-003-world-generation
+    goal: >
+      Generate a deterministic 2D world with bounds, points of interest,
+      humans, mice, homes, workplaces, and reproducible placement.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - Generated worlds contain configured humans, mice, and POIs.
+      - Entity placement is reproducible from seed.
+      - World generation avoids invalid out-of-bounds positions.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-004-movement-day-night
+    title: Implement movement and day/night behavior
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-004-movement-day-night
+    goal: >
+      Add human and mouse movement, destination choice, simple wandering, and
+      day/night destination changes that remain understandable in the UI.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - Humans move toward plausible day and night destinations.
+      - Mice move and interact with the environment.
+      - Movement behavior is deterministic under a fixed seed.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-005-contamination-infection
+    title: Implement contamination and environmental infection
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-005-contamination-infection
+    goal: >
+      Model mouse-created contamination clouds, environmental decay, exposure,
+      and human infection only from contaminated areas.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - Mice create contamination in the environment.
+      - Humans can become infected from contamination.
+      - Humans never infect other humans.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-006-disease-stats
+    title: Implement disease progression, statistics, and R0
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-006-disease-stats
+    goal: >
+      Add disease progression, recovery/death outcomes, aggregate statistics,
+      and a plain-language environmental R0 estimate.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - Health counts update as simulation advances.
+      - Disease progression is testable and configurable.
+      - R0 explanation avoids implying person-to-person spread.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-007-rendering
+    title: Render top-down educational simulation view
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-007-rendering
+    goal: >
+      Render humans, mice, POIs, contamination clouds, health states, and death
+      markers in a clear top-down educational view.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - The app visually distinguishes humans, mice, POIs, and contamination.
+      - Visual state reflects simulation state.
+      - The view remains legible at the default population.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-008-controls-ui
+    title: Build controls and configuration UI
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-008-controls-ui
+    goal: >
+      Add polished native controls for pause/resume, speed, restart, camera,
+      and core simulation parameters.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - Users can pause, resume, restart, and change speed.
+      - Users can adjust core population, world, virus, cloud, wind, and POI settings.
+      - Controls use plain language and do not overlap at common window sizes.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-009-educational-stats-ui
+    title: Build charts, selected-human panel, and explanations
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-009-educational-stats-ui
+    goal: >
+      Add charts, selected-human details, legends, and plain-language
+      explanations for disease states and environmental transmission.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - Statistics are visible and update during simulation.
+      - Selecting a human shows understandable state details.
+      - Explanations avoid advanced statistics jargon.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-010-persistence
+    title: Implement save/load and settings persistence
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-010-persistence
+    goal: >
+      Persist settings between launches and support save/load of full simulation
+      snapshots through serializable model state.
+    allowed_paths: *code_paths
+    acceptance_criteria:
+      - Settings persist between launches.
+      - Full world snapshots save and load.
+      - Loaded snapshots preserve health, positions, contamination, and stats.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-011-polish-issue-log
+    title: Polish UX, defaults, help, and failure tracking
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-011-polish-issue-log
+    goal: >
+      Improve UI polish, default scenarios, help text, legends, and issue-log
+      coverage for failures or scope reductions.
+    allowed_paths:
+      - Cargo.toml
+      - Cargo.lock
+      - src/**
+      - tests/**
+      - assets/**
+      - specs/hantasim-full-build/issue-log.md
+    acceptance_criteria:
+      - The default experience is understandable without expert knowledge.
+      - Known issues and failure points are recorded.
+      - UI text is consistent and readable.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
+
+  - task_id: hantasim-full-build-012-performance-hardening
+    title: Performance, stress testing, and release hardening
+    repo_url: /var/home/j/code/hantasim-test
+    base_branch: feature/hantasim-full-build
+    branch_name: task/hantasim-full-build-012-performance-hardening
+    goal: >
+      Stress test larger scenarios, optimize obvious bottlenecks, harden checks,
+      and document remaining performance risks.
+    allowed_paths:
+      - Cargo.toml
+      - Cargo.lock
+      - src/**
+      - tests/**
+      - assets/**
+      - specs/hantasim-full-build/issue-log.md
+      - specs/hantasim-full-build/proof/**
+    acceptance_criteria:
+      - Default scenario runs smoothly enough for educational use.
+      - A larger stress scenario is documented.
+      - Remaining performance limits are recorded.
+    checks: *rust_checks
+    max_attempts: 3
+    human_review_required: true
+    risk_flags: [no_auto_merge]
+    mock_behavior: pass
